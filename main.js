@@ -1,26 +1,20 @@
-const { mergeDocxFolders } = require("./constants/services/docx-service");
+const fs = require('fs')
+const ConvertService = require("./service/convert.service");
+
 
 (async () => {
-  try {
-    const files = [
-      "doc1.docx",
-      "doc2.docx",
-      "doc3.docx",
-      "doc4.docx",
-      "doc5.docx",
-      "doc6.docx",
-      "doc7.docx",
-      "doc8.docx",
-      "doc9.docx",
-      "doc10.docx",
-    ];
-
-    const outputFile = "merged.docx";
-
-    await mergeDocxFolders(files, outputFile);
-
-    console.log("DOCXs mesclados com sucesso!");
-  } catch (error) {
-    console.error("Erro ao mesclar DOCXs:", error);
+  const inputDocs = []
+  
+  for (let i = 1; i <= 10; i++) {
+    const fileName = `input/doc${i}.docx`;
+    inputDocs.push(fileName);
   }
+
+  const outputDir = 'output/';
+
+  const pdfPaths = await ConvertService.convertDocxCollectionToPdf(inputDocs, outputDir);
+
+  const pdfBuffer = await ConvertService.combinePdfModels(pdfPaths.map(path => ({ pathPdf: path })));
+
+  await fs.promises.writeFile('output/final.pdf', pdfBuffer);
 })();
